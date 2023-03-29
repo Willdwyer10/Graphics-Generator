@@ -36,44 +36,74 @@ public class GUIJFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
         driveUnlock = new javax.swing.JButton();
-        TestLabel = new javax.swing.JLabel();
+        openIgnite = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Graphics Generator");
+        setBackground(new java.awt.Color(255, 51, 51));
         setIconImage(iconImage);
         setName("mainFrame"); // NOI18N
 
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+
+        driveUnlock.setBackground(new java.awt.Color(154, 210, 228));
+        driveUnlock.setFont(new java.awt.Font("Swis721 LtEx BT", 0, 12)); // NOI18N
+        driveUnlock.setIcon(new javax.swing.ImageIcon("C:\\Users\\wbdwy\\Documents\\Eclipse Content\\Personal Projects\\Graphics-Generator\\Graphics Generator\\Images\\Unlock.png")); // NOI18N
         driveUnlock.setText("Unlock Drive");
         driveUnlock.setToolTipText("Click to run WD Drive Unlock");
+        driveUnlock.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         driveUnlock.setName(""); // NOI18N
+        driveUnlock.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         driveUnlock.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 driveUnlockActionPerformed(evt);
             }
         });
 
-        TestLabel.setText("Tester For now");
+        openIgnite.setBackground(new java.awt.Color(154, 210, 228));
+        openIgnite.setFont(new java.awt.Font("Swis721 LtEx BT", 0, 12)); // NOI18N
+        openIgnite.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Ignite Icon.png"))); // NOI18N
+        openIgnite.setText("Open Ignite");
+        openIgnite.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        openIgnite.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        openIgnite.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                openIgniteActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(57, 57, 57)
+                .addComponent(driveUnlock)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(openIgnite, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(59, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(driveUnlock, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(openIgnite, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(87, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(driveUnlock)
-                .addGap(18, 18, 18)
-                .addComponent(TestLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(191, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(driveUnlock)
-                    .addComponent(TestLabel))
-                .addContainerGap(271, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -82,6 +112,10 @@ public class GUIJFrame extends javax.swing.JFrame {
     private void driveUnlockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_driveUnlockActionPerformed
         GuiButtonHandlers.driveUnlock();
     }//GEN-LAST:event_driveUnlockActionPerformed
+
+    private void openIgniteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openIgniteActionPerformed
+      GuiButtonHandlers.runIgnite();
+    }//GEN-LAST:event_openIgniteActionPerformed
 
     /**
      * @param args the command line arguments
@@ -120,7 +154,8 @@ public class GUIJFrame extends javax.swing.JFrame {
     private BufferedImage iconImage;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel TestLabel;
     private javax.swing.JButton driveUnlock;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JButton openIgnite;
     // End of variables declaration//GEN-END:variables
 }
