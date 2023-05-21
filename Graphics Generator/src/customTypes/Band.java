@@ -1,3 +1,5 @@
+package customTypes;
+
 /**
  * represents a band that will be playing on a specific date
  * 
@@ -42,7 +44,6 @@ public class Band {
   public void setName(String name) {
     this.name = name;
   }
-  
   
   /**
    * mutator method for month
@@ -101,7 +102,7 @@ public class Band {
    * 
    * @return a string that can be used as the Band's graphic's filename
    */
-  public String getFileName() {
+  public String generateFileName() {
     // removes all applicable special characters as well as spaces
     String nameNice = this.name.replaceAll("[\\&\\/\\\"\\(\\)\\'\\*]", "").replaceAll(" ", "");
     return "M_" + this.month + "_" + this.date + "_" + nameNice;

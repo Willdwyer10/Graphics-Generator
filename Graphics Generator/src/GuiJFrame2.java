@@ -1,3 +1,5 @@
+import customTypes.Location;
+import autoImporter.RobotOperator;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -7,15 +9,26 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
+import java.awt.AWTException;
 import java.awt.Desktop;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileNameExtensionFilter;
+import graphicGenerator.GraphicGenerator;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinDef.HWND;
 
 
 /*
@@ -32,25 +45,19 @@ public class GuiJFrame2 extends javax.swing.JFrame {
      * Creates new form GuiJFrame2
      */
     public GuiJFrame2() {
-//        this.addEditLocationMode = 1;
-//        this.locations.add(new Location("tester 1", 100, 100));
-//        this.locations.add(new Location("tester 2", 200, 200));
-//        this.currentLocation = 0;
-
-        locationsNew = new ArrayList<Location>(0);
-        this.locationsNew.add(new Location("testerr 1", 100, 100));
-        this.locationsNew.add(new Location("testerr 2", 200, 200));
-        this.currentLocationIndex = 0;
-        
+        locations = new ArrayList<Location>(0);
+        retrieveLocationInformation();
+        if(this.locations.isEmpty())
+            this.locations.add(new Location("default", 100, 100));        
         
         initComponents();
         
-        this.locationComboboxLocationSelector.addItem(this.locationsNew.get(0).getName());
-        this.locationComboboxLocationSelector.addItem(this.locationsNew.get(1).getName());
+        // Updates the labels, if the folder and file isn't null
+        if(this.bandInfoFile != null) this.labelSelectedTxtFile.setText("Selected .txt file: " + this.bandInfoFile.getName());
+        if(this.graphicsSaveLocation != null) this.labelSaveGraphicsTo.setText("Save graphics to: \"" + this.graphicsSaveLocation.getName() + "\" folder");
+
         
-        
-//        this.comboboxLocationSelector.addItem(this.locations.get(0).getName());
-//        this.comboboxLocationSelector.addItem(this.locations.get(1).getName());
+        this.updateCombobox();   
     }
 
     /**
@@ -80,11 +87,18 @@ public class GuiJFrame2 extends javax.swing.JFrame {
         Footer = new javax.swing.JLabel();
         Tabs = new javax.swing.JTabbedPane();
         Main = new javax.swing.JPanel();
-        GenerateGraphics = new javax.swing.JButton();
-        ImportGraphics = new javax.swing.JButton();
-        SaveGraphics = new javax.swing.JButton();
-        SelectTxtFile = new javax.swing.JButton();
-        Folders = new javax.swing.JPanel();
+        buttonGenerateGraphics = new javax.swing.JButton();
+        buttonImportGraphics = new javax.swing.JButton();
+        buttonSaveGraphicsTo = new javax.swing.JButton();
+        buttonSelectTxtFile = new javax.swing.JButton();
+        buttonOpenTxtFile = new javax.swing.JButton();
+        labelSaveGraphicsTo = new javax.swing.JLabel();
+        labelSelectedTxtFile = new javax.swing.JLabel();
+        buttonUnlockDrive = new javax.swing.JButton();
+        buttonOpenIgnite = new javax.swing.JButton();
+        seperatorHorizontal = new javax.swing.JSeparator();
+        seperatorVertical = new javax.swing.JSeparator();
+        seperatorVertical1 = new javax.swing.JSeparator();
         Location = new javax.swing.JPanel();
         locationLabelCurrentLocation = new javax.swing.JLabel();
         locationComboboxLocationSelector = new javax.swing.JComboBox<>();
@@ -93,10 +107,6 @@ public class GuiJFrame2 extends javax.swing.JFrame {
         locationButtonAddLocation = new javax.swing.JButton();
         locationButtonRemoveCurrentLocation = new javax.swing.JButton();
         locationButtonEditCurrentLocation = new javax.swing.JButton();
-        buttonPrint = new javax.swing.JButton();
-        ExternalSoftware = new javax.swing.JPanel();
-        buttonUnlockDrive = new javax.swing.JButton();
-        buttonOpenIgnite = new javax.swing.JButton();
 
         windowAddLocation.setTitle("Add Location");
         windowAddLocation.setMinimumSize(new java.awt.Dimension(190, 210));
@@ -253,6 +263,14 @@ public class GuiJFrame2 extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Graphics Generator");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         Footer.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         Footer.setText("Current location: TODO FINISH THIS" +  "     ");
@@ -266,13 +284,13 @@ public class GuiJFrame2 extends javax.swing.JFrame {
         }
         Image dimgGearIcon = imgGearIcon.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         ImageIcon imageIconGearIcon = new ImageIcon(dimgGearIcon);
-        GenerateGraphics.setText("Generate graphics");
-        GenerateGraphics.setToolTipText("Generate the graphics into the selected folder");
-        GenerateGraphics.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        GenerateGraphics.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        GenerateGraphics.addActionListener(new java.awt.event.ActionListener() {
+        buttonGenerateGraphics.setText("Generate graphics");
+        buttonGenerateGraphics.setToolTipText("Generate the graphics into the selected folder");
+        buttonGenerateGraphics.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        buttonGenerateGraphics.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        buttonGenerateGraphics.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                GenerateGraphicsActionPerformed(evt);
+                buttonGenerateGraphicsActionPerformed(evt);
             }
         });
 
@@ -284,75 +302,135 @@ public class GuiJFrame2 extends javax.swing.JFrame {
         }
         Image dimgImportIcon = imgImportIcon.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         ImageIcon imageIconImportIcon = new ImageIcon(dimgImportIcon);
-        ImportGraphics.setText("Import graphics");
-        ImportGraphics.setToolTipText("Start the automatic importing of graphics into Ignite");
-        ImportGraphics.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        ImportGraphics.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        ImportGraphics.addActionListener(new java.awt.event.ActionListener() {
+        buttonImportGraphics.setText("Import graphics");
+        buttonImportGraphics.setToolTipText("Start the automatic importing of graphics into Ignite");
+        buttonImportGraphics.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        buttonImportGraphics.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        buttonImportGraphics.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ImportGraphicsActionPerformed(evt);
+                buttonImportGraphicsActionPerformed(evt);
             }
         });
 
-        SaveGraphics.setText("Save graphics to...");
-        SaveGraphics.setToolTipText("Select the folder to save graphics to");
-        SaveGraphics.addActionListener(new java.awt.event.ActionListener() {
+        buttonSaveGraphicsTo.setText("Save graphics to...");
+        buttonSaveGraphicsTo.setToolTipText("Select the folder to save graphics to");
+        buttonSaveGraphicsTo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SaveGraphicsActionPerformed(evt);
+                buttonSaveGraphicsToActionPerformed(evt);
             }
         });
 
-        SelectTxtFile.setText("Select .txt file");
-        SelectTxtFile.setToolTipText("Select the .txt file containing the band information");
-        SelectTxtFile.addActionListener(new java.awt.event.ActionListener() {
+        buttonSelectTxtFile.setText("Select .txt file");
+        buttonSelectTxtFile.setToolTipText("Select the .txt file containing the band information");
+        buttonSelectTxtFile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SelectTxtFileActionPerformed(evt);
+                buttonSelectTxtFileActionPerformed(evt);
             }
         });
+
+        buttonOpenTxtFile.setText("Open selected .txt file");
+        buttonOpenTxtFile.setToolTipText("Click here to open the selected .txt file");
+        buttonOpenTxtFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonOpenTxtFileActionPerformed(evt);
+            }
+        });
+
+        labelSaveGraphicsTo.setText("Save graphics to: no location selected");
+
+        labelSelectedTxtFile.setText("Selected .txt file: no file selected");
+
+        buttonUnlockDrive.setText("Unlock Drive");
+        buttonUnlockDrive.setToolTipText("Unlock the hard drive using WD Drive Unlocker");
+        buttonUnlockDrive.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonUnlockDriveActionPerformed(evt);
+            }
+        });
+
+        buttonOpenIgnite.setText("Open Ignite");
+        buttonOpenIgnite.setToolTipText("Open the Ignite OPx software");
+        buttonOpenIgnite.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonOpenIgniteActionPerformed(evt);
+            }
+        });
+
+        seperatorVertical.setOrientation(javax.swing.SwingConstants.VERTICAL);
+
+        seperatorVertical1.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
         javax.swing.GroupLayout MainLayout = new javax.swing.GroupLayout(Main);
         Main.setLayout(MainLayout);
         MainLayout.setHorizontalGroup(
             MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(MainLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(GenerateGraphics, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(SaveGraphics, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(18, 18, 18)
+                .addGap(20, 20, 20)
                 .addGroup(MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(ImportGraphics, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(SelectTxtFile, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(153, Short.MAX_VALUE))
+                    .addComponent(labelSelectedTxtFile)
+                    .addGroup(MainLayout.createSequentialGroup()
+                        .addComponent(labelSaveGraphicsTo)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+            .addGroup(MainLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(seperatorHorizontal)
+                    .addGroup(MainLayout.createSequentialGroup()
+                        .addGroup(MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(MainLayout.createSequentialGroup()
+                                .addGroup(MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(buttonGenerateGraphics, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addGroup(MainLayout.createSequentialGroup()
+                                        .addGap(0, 0, Short.MAX_VALUE)
+                                        .addComponent(buttonImportGraphics, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(7, 7, 7)
+                                .addComponent(seperatorVertical1, javax.swing.GroupLayout.PREFERRED_SIZE, 3, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(8, 8, 8)
+                                .addGroup(MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(buttonSelectTxtFile, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(buttonSaveGraphicsTo, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(7, 7, 7)
+                                .addComponent(seperatorVertical, javax.swing.GroupLayout.PREFERRED_SIZE, 3, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(buttonUnlockDrive, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(buttonOpenIgnite, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(buttonOpenTxtFile))
+                        .addGap(0, 12, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         MainLayout.setVerticalGroup(
             MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(MainLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(GenerateGraphics)
-                    .addComponent(ImportGraphics))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(SaveGraphics)
-                    .addComponent(SelectTxtFile))
-                .addContainerGap(109, Short.MAX_VALUE))
+                    .addGroup(MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(MainLayout.createSequentialGroup()
+                            .addGroup(MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(buttonGenerateGraphics)
+                                .addGroup(MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(buttonUnlockDrive)
+                                    .addComponent(buttonSaveGraphicsTo)))
+                            .addGap(18, 18, 18)
+                            .addGroup(MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(buttonSelectTxtFile)
+                                    .addComponent(buttonOpenIgnite))
+                                .addComponent(buttonImportGraphics)))
+                        .addComponent(seperatorVertical))
+                    .addComponent(seperatorVertical1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(seperatorHorizontal, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2)
+                .addComponent(buttonOpenTxtFile)
+                .addGap(18, 18, 18)
+                .addComponent(labelSaveGraphicsTo)
+                .addGap(18, 18, 18)
+                .addComponent(labelSelectedTxtFile)
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         Tabs.addTab("Main", Main);
-
-        javax.swing.GroupLayout FoldersLayout = new javax.swing.GroupLayout(Folders);
-        Folders.setLayout(FoldersLayout);
-        FoldersLayout.setHorizontalGroup(
-            FoldersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 438, Short.MAX_VALUE)
-        );
-        FoldersLayout.setVerticalGroup(
-            FoldersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 173, Short.MAX_VALUE)
-        );
-
-        Tabs.addTab("Folders", Folders);
 
         locationLabelCurrentLocation.setText("Current Location");
 
@@ -388,13 +466,6 @@ public class GuiJFrame2 extends javax.swing.JFrame {
             }
         });
 
-        buttonPrint.setText("Print");
-        buttonPrint.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonPrintActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout LocationLayout = new javax.swing.GroupLayout(Location);
         Location.setLayout(LocationLayout);
         LocationLayout.setHorizontalGroup(
@@ -411,18 +482,14 @@ public class GuiJFrame2 extends javax.swing.JFrame {
                     .addComponent(locationComboboxLocationSelector, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(locationButtonAddLocation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(locationButtonRemoveCurrentLocation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 58, Short.MAX_VALUE)
-                .addComponent(buttonPrint)
-                .addGap(36, 36, 36))
+                .addContainerGap(153, Short.MAX_VALUE))
         );
         LocationLayout.setVerticalGroup(
             LocationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(LocationLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(LocationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(LocationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(locationComboboxLocationSelector, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(buttonPrint))
+                    .addComponent(locationComboboxLocationSelector, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(locationLabelCurrentLocation))
                 .addGap(18, 18, 18)
                 .addGroup(LocationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -434,49 +501,10 @@ public class GuiJFrame2 extends javax.swing.JFrame {
                     .addComponent(locationButtonRemoveCurrentLocation))
                 .addGap(18, 18, 18)
                 .addComponent(locationButtonEditCurrentLocation)
-                .addContainerGap(21, Short.MAX_VALUE))
+                .addContainerGap(43, Short.MAX_VALUE))
         );
 
         Tabs.addTab("Location", Location);
-
-        buttonUnlockDrive.setText("Unlock Drive");
-        buttonUnlockDrive.setToolTipText("Unlock the hard drive using WD Drive Unlocker");
-        buttonUnlockDrive.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonUnlockDriveActionPerformed(evt);
-            }
-        });
-
-        buttonOpenIgnite.setText("Open Ignite");
-        buttonOpenIgnite.setToolTipText("Open the Ignite OPx software");
-        buttonOpenIgnite.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonOpenIgniteActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout ExternalSoftwareLayout = new javax.swing.GroupLayout(ExternalSoftware);
-        ExternalSoftware.setLayout(ExternalSoftwareLayout);
-        ExternalSoftwareLayout.setHorizontalGroup(
-            ExternalSoftwareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(ExternalSoftwareLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(ExternalSoftwareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(buttonUnlockDrive, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(buttonOpenIgnite, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(335, Short.MAX_VALUE))
-        );
-        ExternalSoftwareLayout.setVerticalGroup(
-            ExternalSoftwareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(ExternalSoftwareLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(buttonUnlockDrive)
-                .addGap(18, 18, 18)
-                .addComponent(buttonOpenIgnite)
-                .addContainerGap(103, Short.MAX_VALUE))
-        );
-
-        Tabs.addTab("External Software", ExternalSoftware);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -488,7 +516,7 @@ public class GuiJFrame2 extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(Tabs, javax.swing.GroupLayout.PREFERRED_SIZE, 204, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(Tabs, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(Footer))
         );
@@ -497,71 +525,80 @@ public class GuiJFrame2 extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * loads all past data into this object's local variables
-     * 
-     * ex: loads all past locations in
-     * 
-     */
-    private void loadPastData() {
-        
-    }
-    
-    /**
-     * sets this.current location to the current location that is selected
-     */
-    private int findCurrentLocation(String toFind) {
-      for(int i = 0; i < this.locations.size(); i++) {
-        if(this.locations.get(i).getName().equals(toFind)) {
-          return i;
-        }
+    private void buttonSelectTxtFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSelectTxtFileActionPerformed
+      JFileChooser fileChooser = new JFileChooser();
+      FileNameExtensionFilter filter = new FileNameExtensionFilter("Text files", "txt");
+      fileChooser.setCurrentDirectory(new File("C:\\Users\\wdwyer\\Desktop"));
+      fileChooser.setAcceptAllFileFilterUsed(false);
+      fileChooser.setFileFilter(filter);
+      
+      if(this.bandInfoFile != null)
+        fileChooser.setCurrentDirectory(this.bandInfoFile);
+      
+      if(fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+        bandInfoFile = new File(fileChooser.getSelectedFile().getAbsolutePath());
+        this.labelSelectedTxtFile.setText("Selected .txt file: " + this.bandInfoFile.getName());
       }
-      return 0;
-    }
-    
-    /**
-     * updates the comboBox with the new, edited locations
-     */
-//    private void updateComboBox() {
-//        this.comboboxLocationSelector.removeAllItems();
-//        for(Location location : this.locations) {
-//            this.comboboxLocationSelector.addItem(location.getName());
-//        }
-//    }
-    
-    private void SelectTxtFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SelectTxtFileActionPerformed
-      System.out.println("select txt file clicked");
-    }//GEN-LAST:event_SelectTxtFileActionPerformed
+      
+    }//GEN-LAST:event_buttonSelectTxtFileActionPerformed
 
-    private void SaveGraphicsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveGraphicsActionPerformed
-      System.out.println("save graphics clicked");
+    private void buttonSaveGraphicsToActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSaveGraphicsToActionPerformed
       JFileChooser chooser = new JFileChooser();
+      
       chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
       chooser.setAcceptAllFileFilterUsed(false);
-    if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) { 
-      System.out.println("getCurrentDirectory(): " 
-         +  chooser.getCurrentDirectory());
-      System.out.println("getSelectedFile() : " 
-         +  chooser.getSelectedFile());
+      if(this.graphicsSaveLocation != null)
+          chooser.setCurrentDirectory(this.graphicsSaveLocation);
+      
+      if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) { 
+        this.graphicsSaveLocation = chooser.getSelectedFile();
+        this.labelSaveGraphicsTo.setText("Save graphics to: \"" + this.graphicsSaveLocation.getName() + "\" folder");
       }
-/*
-      FileNameExtensionFilter filter = new FileNameExtensionFilter(
-        "JPG & GIF Images", "jpg", "gif");
-      chooser.setFileFilter(filter);
-      int returnVal = chooser.showOpenDialog(Main);
-      if(returnVal == JFileChooser.APPROVE_OPTION) {
-       System.out.println("You chose to open this file: " +
-            chooser.getSelectedFile().getName());
-    }*/
-    }//GEN-LAST:event_SaveGraphicsActionPerformed
+    }//GEN-LAST:event_buttonSaveGraphicsToActionPerformed
 
-    private void ImportGraphicsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ImportGraphicsActionPerformed
-      System.out.println("import graphics clicked");
-    }//GEN-LAST:event_ImportGraphicsActionPerformed
+    private void buttonImportGraphicsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonImportGraphicsActionPerformed
+      if(this.generator == null) {
+        JOptionPane.showMessageDialog(null, "Please generate graphics before importing them.", "Import Graphics Error", 2);
+      } else if (this.generator.getNumBands() == -1) {
+        JOptionPane.showMessageDialog(null, "Please allow all graphics to be generated before importing them.", "Import Graphics Error", 2);
+      } else {
+        try {
+          if (!isProcessRunning("Ignite_x64.exe")){
+            JOptionPane.showMessageDialog(null, "Please open Ignite before importing graphics.", "Import Graphics Error", 2);
+          } else {
+            try {
+            //TODO: update this
+              new RobotOperator(this.generator.getNumBands());
+              /*try {
+                this.bringIgniteToFront();
+              } catch (InterruptedException e) {
+                JOptionPane.showMessageDialog(null, "There was an error running the automatic importer.", "Import Graphics Error", 2);
+              }*/
+            } catch (AWTException e) {
+              JOptionPane.showMessageDialog(null, "There was an error running the automatic importer.", "Import Graphics Error", 2);
+            }
+          }
+        } catch (IOException e) {
+          JOptionPane.showMessageDialog(null, "There was an error running the automatic importer.", "Import Graphics Error", 2);
+        }
+      }
+    }//GEN-LAST:event_buttonImportGraphicsActionPerformed
 
-    private void GenerateGraphicsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GenerateGraphicsActionPerformed
-      System.out.println("generate graphics clicked");
-    }//GEN-LAST:event_GenerateGraphicsActionPerformed
+    private void buttonGenerateGraphicsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonGenerateGraphicsActionPerformed
+      // double checking that a band file has been selected already
+      if(this.bandInfoFile == null || !this.bandInfoFile.getName().substring(this.bandInfoFile.getName().length()-3).equals("txt")) {
+        JOptionPane.showMessageDialog(null, "Please select a .txt file before generating graphics.", "Generate Graphics Error", 2);
+      } else if (this.graphicsSaveLocation == null) {
+        JOptionPane.showMessageDialog(null, "Please select a folder to save the generated graphics to before generating graphics.", "Generate Graphics Error", 2);
+      } else {
+        try {
+          this.generator = new GraphicGenerator(this.locations.get(currentLocationIndex), this.bandInfoFile, this.graphicsSaveLocation);
+        } catch (FileNotFoundException e) {
+          System.out.print("for some reason, the txt file was not correct");
+          e.printStackTrace();
+        }
+      }
+    }//GEN-LAST:event_buttonGenerateGraphicsActionPerformed
 
     private void buttonUnlockDriveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonUnlockDriveActionPerformed
       Desktop desktop = null;    
@@ -571,7 +608,7 @@ public class GuiJFrame2 extends javax.swing.JFrame {
         }
         desktop.open(new File("C:\\Users\\wbdwy\\Desktop\\Unlock.lnk"));
       } catch (IOException e) {      
-        JOptionPane.showMessageDialog(null, "There was an error running WD Drive Unlock", "Unlock Drive Error", 2);
+        JOptionPane.showMessageDialog(null, "There was an error running WD Drive Unlock.", "Unlock Drive Error", 2);
       }
     }//GEN-LAST:event_buttonUnlockDriveActionPerformed
 
@@ -583,9 +620,9 @@ public class GuiJFrame2 extends javax.swing.JFrame {
         }
         desktop.open(new File("C:\\Program Files\\Ignite12\\Ignite_x64.exe"));
       } catch (IOException e) {      
-        JOptionPane.showMessageDialog(null, "There was an error opening Ignite", "Open Ignite Error", 2);
+        JOptionPane.showMessageDialog(null, "There was an error opening Ignite.", "Open Ignite Error", 2);
       } catch (RuntimeException e) {
-        JOptionPane.showMessageDialog(null, "There was an error opening Ignite", "Open Ignite Error", 2);
+        JOptionPane.showMessageDialog(null, "There was an error opening Ignite.", "Open Ignite Error", 2);
 
       }
     }//GEN-LAST:event_buttonOpenIgniteActionPerformed
@@ -595,36 +632,28 @@ public class GuiJFrame2 extends javax.swing.JFrame {
       windowAddLocation.setVisible(true);
     }//GEN-LAST:event_locationButtonAddLocationActionPerformed
 
-    private void buttonPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPrintActionPerformed
-        System.out.println("Locations:");
-        for(Location location : locationsNew)
-            System.out.println("locations: " + location);
-        System.out.println("current location: " + this.currentLocationIndex + "\n");
-        
-    }//GEN-LAST:event_buttonPrintActionPerformed
-
     private void locationComboboxLocationSelectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_locationComboboxLocationSelectorActionPerformed
         this.locationNewFindCurrentLocation();
-        this.Footer.setText("Current location: " + this.locationsNew.get(this.currentLocationIndex).getName() + "     ");
-        locationLabelGraphicWidth.setText("Width: " + this.locationsNew.get(this.currentLocationIndex).getGraphicWidth());
-        locationLabelGraphicHeight.setText("Height: " + this.locationsNew.get(this.currentLocationIndex).getGraphicHeight());
+        this.Footer.setText("Current location: " + this.locations.get(this.currentLocationIndex).getName() + "     ");
+        locationLabelGraphicWidth.setText("Width: " + this.locations.get(this.currentLocationIndex).getGraphicWidth());
+        locationLabelGraphicHeight.setText("Height: " + this.locations.get(this.currentLocationIndex).getGraphicHeight());
 
     }//GEN-LAST:event_locationComboboxLocationSelectorActionPerformed
 
     private void addLocationButtonSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addLocationButtonSaveActionPerformed
         if(this.locationNameTaken(addLocationTextFieldName.getText())) {
-            JOptionPane.showMessageDialog(null, "This name is already being used. Please enter a new name", "Add Error", 2);
+            JOptionPane.showMessageDialog(null, "This name is already being used. Please enter a new name.", "Add Error", 2);
         } else {    
             try {
-                this.locationsNew.add(new Location(addLocationTextFieldName.getText(), Integer.parseInt(addLocationTextFieldGraphicWidth.getText()), Integer.parseInt(addLocationTextFieldGraphicHeight.getText())));
+                this.locations.add(new Location(addLocationTextFieldName.getText(), Integer.parseInt(addLocationTextFieldGraphicWidth.getText()), Integer.parseInt(addLocationTextFieldGraphicHeight.getText())));
                 //this.currentLocationIndex = this.locationsNew.size()-1;
-                this.locationComboboxLocationSelector.addItem(this.locationsNew.get(this.locationsNew.size()-1).getName());
+                this.locationComboboxLocationSelector.addItem(this.locations.get(this.locations.size()-1).getName());
                 addLocationTextFieldName.setText("Name");
                 addLocationTextFieldGraphicWidth.setText("100");
                 addLocationTextFieldGraphicHeight.setText("100");
                 windowAddLocation.dispose();
             } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "Please enter numeric values for width and height", "Add error", 2);
+                JOptionPane.showMessageDialog(null, "Please enter numeric values for width and height.", "Add error", 2);
             }
         }
     }//GEN-LAST:event_addLocationButtonSaveActionPerformed
@@ -632,45 +661,41 @@ public class GuiJFrame2 extends javax.swing.JFrame {
     private void locationButtonEditCurrentLocationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_locationButtonEditCurrentLocationActionPerformed
         windowEditLocation.setLocation(this.getX() + 50, this.getY() + 50);
         windowEditLocation.setVisible(true);
-        editLocationTextFieldName.setText(this.locationsNew.get(this.currentLocationIndex).getName());
-        editLocationTextFieldGraphicWidth.setText(Integer.toString(this.locationsNew.get(this.currentLocationIndex).getGraphicWidth()));
-        editLocationTextFieldGraphicHeight.setText(Integer.toString(this.locationsNew.get(this.currentLocationIndex).getGraphicHeight()));
+        editLocationTextFieldName.setText(this.locations.get(this.currentLocationIndex).getName());
+        editLocationTextFieldGraphicWidth.setText(Integer.toString(this.locations.get(this.currentLocationIndex).getGraphicWidth()));
+        editLocationTextFieldGraphicHeight.setText(Integer.toString(this.locations.get(this.currentLocationIndex).getGraphicHeight()));
     }//GEN-LAST:event_locationButtonEditCurrentLocationActionPerformed
 
     private void locationButtonRemoveCurrentLocationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_locationButtonRemoveCurrentLocationActionPerformed
-        if(this.locationsNew.size() == 1) {
-            JOptionPane.showMessageDialog(null, "Please add another location before removing this one", "Remove Error", 2);
+        if(this.locations.size() == 1) {
+            JOptionPane.showMessageDialog(null, "Please add another location before removing this one.", "Remove Error", 2);
         } else {
-            this.locationsNew.remove(this.currentLocationIndex);
-            this.currentLocationIndex = 0;
-            this.updateComboboxNew();
+            this.locations.remove(this.currentLocationIndex);
+            this.updateCombobox();
         }
     }//GEN-LAST:event_locationButtonRemoveCurrentLocationActionPerformed
 
     private void editLocationTextFieldGraphicWidthActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editLocationTextFieldGraphicWidthActionPerformed
-        // TODO add your handling code here:
     }//GEN-LAST:event_editLocationTextFieldGraphicWidthActionPerformed
 
     private void editLocationTextFieldGraphicHeightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editLocationTextFieldGraphicHeightActionPerformed
-        // TODO add your handling code here:
     }//GEN-LAST:event_editLocationTextFieldGraphicHeightActionPerformed
 
     private void addLocationTextFieldGraphicWidthActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addLocationTextFieldGraphicWidthActionPerformed
-        // TODO add your handling code here:
     }//GEN-LAST:event_addLocationTextFieldGraphicWidthActionPerformed
 
     private void addLocationTextFieldGraphicHeightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addLocationTextFieldGraphicHeightActionPerformed
-        // TODO add your handling code here:
     }//GEN-LAST:event_addLocationTextFieldGraphicHeightActionPerformed
 
     private void editLocationButtonSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editLocationButtonSaveActionPerformed
          try {
-            this.locationsNew.get(this.currentLocationIndex).setName(editLocationTextFieldName.getText());
-            this.locationsNew.get(this.currentLocationIndex).setGraphicWidth(Integer.parseInt(editLocationTextFieldGraphicWidth.getText()));
-            this.locationsNew.get(this.currentLocationIndex).setGraphicHeight(Integer.parseInt(editLocationTextFieldGraphicHeight.getText()));
-            
-            this.currentLocationIndex = 0;
-            this.updateComboboxNew();
+            this.locations.get(this.currentLocationIndex).setName(editLocationTextFieldName.getText());
+            this.locations.get(this.currentLocationIndex).setGraphicWidth(Integer.parseInt(editLocationTextFieldGraphicWidth.getText()));
+            this.locations.get(this.currentLocationIndex).setGraphicHeight(Integer.parseInt(editLocationTextFieldGraphicHeight.getText()));
+            int temp = this.currentLocationIndex;
+            this.updateCombobox();
+            this.currentLocationIndex = temp;
+            this.locationComboboxLocationSelector.setSelectedIndex(temp);
             
             editLocationTextFieldName.setText("Name");
             editLocationTextFieldGraphicWidth.setText("100");
@@ -682,20 +707,99 @@ public class GuiJFrame2 extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_editLocationButtonSaveActionPerformed
 
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+    }//GEN-LAST:event_formWindowClosed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        this.serializeLocationInformation();
+    }//GEN-LAST:event_formWindowClosing
+
+    private void buttonOpenTxtFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonOpenTxtFileActionPerformed
+        if(this.bandInfoFile == null) 
+            JOptionPane.showMessageDialog(null, "Please select a .txt file to open.", "Open .txt Error", 2);
+        else {
+            Desktop desktop = null;    
+            try {
+              if (Desktop.isDesktopSupported()) {
+                desktop = Desktop.getDesktop();
+              }
+              desktop.open(this.bandInfoFile);
+            } catch (IOException e) {      
+              JOptionPane.showMessageDialog(null, "There was an error opening the .txt file.", "Open .txt Error", 2);
+            }
+        }
+
+    }//GEN-LAST:event_buttonOpenTxtFileActionPerformed
+
     private void addLocationTextFieldNameActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
     }
     
     private void editLocationTextFieldNameActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+    }
+    
+    /**
+     * When the program starts up, this retrieves all the serialized information about previously
+     * added Locations so that users do not need to re-enter Locations every time
+     */
+    private void retrieveLocationInformation() {        
+        try {
+            FileInputStream fileIn = new FileInputStream("Resources\\locationInformation.ser");
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            
+            int count = (Integer) in.readObject();
+            
+            for(int i = 0; i < count; i++) {
+                locations.add((Location) in.readObject());
+            }
+            
+            this.bandInfoFile = (File) in.readObject();
+            this.graphicsSaveLocation = (File) in.readObject();
+            
+            in.close();
+            fileIn.close();
+        } catch (FileNotFoundException ex) {
+            locations.add(new Location("Default", 100, 100));
+            //ex.printStackTrace();
+        } catch (IOException ex) {
+            //ex.printStackTrace();
+        } catch (ClassNotFoundException ex) {
+            //ex.printStackTrace();
+        }
+    }
+    
+    /**
+     * When the program is done running, this saves all the information about Locations so that it can
+     * be retrieved the next time the program is being used
+     */
+    private void serializeLocationInformation() {        
+        try {
+            FileOutputStream fileOut = new FileOutputStream("Resources\\locationInformation.ser");
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            
+            out.writeObject(this.locations.size());
+            
+            for(Location location : this.locations)
+                out.writeObject(location);
+            
+            out.writeObject(bandInfoFile);
+            out.writeObject(graphicsSaveLocation);
+            
+            out.close();
+            fileOut.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     
     /**
      * After a location has been removed or edited, this method updates the combobox with the new names of the remaining Locations
      */
-    private void updateComboboxNew() {
+    private void updateCombobox() {
+        this.currentLocationIndex = 0;
         this.locationComboboxLocationSelector.removeAllItems();
-        for(Location l : this.locationsNew) {
+        for(Location l : this.locations) {
             this.locationComboboxLocationSelector.addItem(l.getName());
         }
     }
@@ -707,7 +811,7 @@ public class GuiJFrame2 extends javax.swing.JFrame {
      * @return true if the location name is taken, and false otherwise
      */
     private boolean locationNameTaken(String name) {
-        for(Location l : this.locationsNew)
+        for(Location l : this.locations)
             if(l.getName().equals(name)) return true;
         
         return false;
@@ -718,8 +822,8 @@ public class GuiJFrame2 extends javax.swing.JFrame {
      * has the same name as the currently selected name in the locationsNewComboboxLocationSelector
      */
     private void locationNewFindCurrentLocation() {
-        for(int i = 0; i < this.locationsNew.size(); i++) {
-            if(locationsNew.get(i).getName().equals(locationComboboxLocationSelector.getSelectedItem())) {
+        for(int i = 0; i < this.locations.size(); i++) {
+            if(locations.get(i).getName().equals(locationComboboxLocationSelector.getSelectedItem())) {
                 this.currentLocationIndex = i;
                 return;
             }
@@ -727,39 +831,49 @@ public class GuiJFrame2 extends javax.swing.JFrame {
     }
     
     /**
+     * 
+     * @param processName - the process of interest to see if it's running or not yet
+     * @return true if the process is open (according to Task Manager) or false otherwise
+     * @throws IOException - honestly, not too sure what this does
+     */
+    public boolean isProcessRunning(String processName) throws IOException{
+      String line;
+      String pidInfo ="";
+
+      Process p =Runtime.getRuntime().exec(System.getenv("windir") +"\\system32\\"+"tasklist.exe");
+
+      BufferedReader input =  new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+      while ((line = input.readLine()) != null) {
+          pidInfo+=line; 
+      }
+
+      input.close();
+
+      if(pidInfo.contains(processName))
+          return true;
+      return false;
+    }
+    
+    
+    public void bringIgniteToFront() throws IOException, InterruptedException {
+      String taskPath = "C:\\Program Files\\Ignite12\\Ignite_x64.exe";
+      Desktop.getDesktop().open(new File(taskPath));
+      Thread.sleep(1000); // Wait for the window to open
+      HWND hwnd = User32.INSTANCE.FindWindow(null, "Ignite_x64.exe");
+      User32.INSTANCE.SetForegroundWindow(hwnd);
+    }
+    
+    /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
       try {
         UIManager.setLookAndFeel(new FlatMacDarkLaf());
       } catch (UnsupportedLookAndFeelException ex) {
         Logger.getLogger(GuiJFrame2.class.getName()).log(Level.SEVERE, null, ex);
       }
-      /*
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(GuiJFrame2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(GuiJFrame2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(GuiJFrame2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(GuiJFrame2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        */
-        //</editor-fold>
-
+      
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -768,28 +882,16 @@ public class GuiJFrame2 extends javax.swing.JFrame {
         });
     }
     
+    private ArrayList<Location> locations; // the Locations that graphics can be made for
+    private int currentLocationIndex; // the postive integer number that is current
+    private File bandInfoFile; // the .txt file that has the band information in it
+    private File graphicsSaveLocation; // the directory to save generated graphcis to
+    private GraphicGenerator generator; // the object that generates the graphics
     
-    
-    
-    
-    private ArrayList<Location> locationsNew;
-    private int currentLocationIndex;
-    
-    
-    
-    private ArrayList<Location> locations = new ArrayList<Location>(0);
-    private int currentLocation;
-    private int addEditLocationMode; // 1 for addition mode, 2 for edit mode
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel ExternalSoftware;
-    private javax.swing.JPanel Folders;
     private javax.swing.JLabel Footer;
-    private javax.swing.JButton GenerateGraphics;
-    private javax.swing.JButton ImportGraphics;
     private javax.swing.JPanel Location;
     private javax.swing.JPanel Main;
-    private javax.swing.JButton SaveGraphics;
-    private javax.swing.JButton SelectTxtFile;
     private javax.swing.JTabbedPane Tabs;
     private javax.swing.JButton addLocationButtonSave;
     private javax.swing.JLabel addLocationLabelGraphicHeight;
@@ -797,8 +899,12 @@ public class GuiJFrame2 extends javax.swing.JFrame {
     private javax.swing.JTextField addLocationTextFieldGraphicHeight;
     private javax.swing.JTextField addLocationTextFieldGraphicWidth;
     private javax.swing.JTextField addLocationTextFieldName;
+    private javax.swing.JButton buttonGenerateGraphics;
+    private javax.swing.JButton buttonImportGraphics;
     private javax.swing.JButton buttonOpenIgnite;
-    private javax.swing.JButton buttonPrint;
+    private javax.swing.JButton buttonOpenTxtFile;
+    private javax.swing.JButton buttonSaveGraphicsTo;
+    private javax.swing.JButton buttonSelectTxtFile;
     private javax.swing.JButton buttonUnlockDrive;
     private javax.swing.JButton editLocationButtonSave;
     private javax.swing.JLabel editLocationLabeWidth;
@@ -807,6 +913,8 @@ public class GuiJFrame2 extends javax.swing.JFrame {
     private javax.swing.JTextField editLocationTextFieldGraphicWidth;
     private javax.swing.JTextField editLocationTextFieldName;
     private javax.swing.JFileChooser fileChooser;
+    private javax.swing.JLabel labelSaveGraphicsTo;
+    private javax.swing.JLabel labelSelectedTxtFile;
     private javax.swing.JButton locationButtonAddLocation;
     private javax.swing.JButton locationButtonEditCurrentLocation;
     private javax.swing.JButton locationButtonRemoveCurrentLocation;
@@ -814,6 +922,9 @@ public class GuiJFrame2 extends javax.swing.JFrame {
     private javax.swing.JLabel locationLabelCurrentLocation;
     private javax.swing.JLabel locationLabelGraphicHeight;
     private javax.swing.JLabel locationLabelGraphicWidth;
+    private javax.swing.JSeparator seperatorHorizontal;
+    private javax.swing.JSeparator seperatorVertical;
+    private javax.swing.JSeparator seperatorVertical1;
     private javax.swing.JFrame windowAddLocation;
     private javax.swing.JFrame windowEditLocation;
     // End of variables declaration//GEN-END:variables

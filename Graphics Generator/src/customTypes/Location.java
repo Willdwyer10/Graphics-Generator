@@ -1,9 +1,15 @@
+package customTypes;
+
 /**
  * represents a location, namely information regarding the location's sign's information
  * 
  * @author william
  */
-public class Location {
+public class Location implements java.io.Serializable {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
   private int graphicWidth;
   private int graphicHeight;
   private String name;

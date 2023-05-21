@@ -7,5 +7,7 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Laf"/>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="lib/jna-5.13.0.jar"/>
+	<classpathentry kind="lib" path="lib/jna-platform-jpms-5.13.0.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

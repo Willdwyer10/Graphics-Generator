@@ -221,6 +221,10 @@
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
     <SyntheticProperty name="generateCenter" type="boolean" value="true"/>
   </SyntheticProperties>
+  <Events>
+    <EventHandler event="windowClosed" listener="java.awt.event.WindowListener" parameters="java.awt.event.WindowEvent" handler="formWindowClosed"/>
+    <EventHandler event="windowClosing" listener="java.awt.event.WindowListener" parameters="java.awt.event.WindowEvent" handler="formWindowClosing"/>
+  </Events>
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
@@ -243,7 +247,7 @@
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
-              <Component id="Tabs" min="-2" pref="204" max="-2" attributes="0"/>
+              <Component id="Tabs" min="-2" pref="225" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
               <Component id="Footer" min="-2" max="-2" attributes="0"/>
           </Group>
@@ -276,18 +280,51 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="GenerateGraphics" max="32767" attributes="0"/>
-                          <Component id="SaveGraphics" max="32767" attributes="0"/>
-                      </Group>
-                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="ImportGraphics" min="-2" pref="135" max="-2" attributes="0"/>
-                          <Component id="SelectTxtFile" min="-2" pref="135" max="-2" attributes="0"/>
+                          <Component id="labelSelectedTxtFile" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="labelSaveGraphicsTo" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
+                          </Group>
                       </Group>
-                      <EmptySpace pref="153" max="32767" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="seperatorHorizontal" max="32767" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" attributes="0">
+                                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                          <Component id="buttonGenerateGraphics" max="32767" attributes="0"/>
+                                          <Group type="102" attributes="0">
+                                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                              <Component id="buttonImportGraphics" min="-2" pref="135" max="-2" attributes="0"/>
+                                          </Group>
+                                      </Group>
+                                      <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
+                                      <Component id="seperatorVertical1" min="-2" pref="3" max="-2" attributes="0"/>
+                                      <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="buttonSelectTxtFile" min="-2" pref="135" max="-2" attributes="0"/>
+                                          <Component id="buttonSaveGraphicsTo" min="-2" pref="135" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
+                                      <Component id="seperatorVertical" min="-2" pref="3" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                          <Component id="buttonUnlockDrive" max="32767" attributes="0"/>
+                                          <Component id="buttonOpenIgnite" max="32767" attributes="0"/>
+                                      </Group>
+                                  </Group>
+                                  <Component id="buttonOpenTxtFile" alignment="0" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="0" pref="12" max="32767" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -296,21 +333,43 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="GenerateGraphics" min="-2" max="-2" attributes="0"/>
-                          <Component id="ImportGraphics" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Group type="102" attributes="0">
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="buttonGenerateGraphics" min="-2" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="3" attributes="0">
+                                          <Component id="buttonUnlockDrive" alignment="3" min="-2" max="-2" attributes="0"/>
+                                          <Component id="buttonSaveGraphicsTo" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                  </Group>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Group type="103" groupAlignment="3" attributes="0">
+                                          <Component id="buttonSelectTxtFile" alignment="3" min="-2" max="-2" attributes="0"/>
+                                          <Component id="buttonOpenIgnite" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <Component id="buttonImportGraphics" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
+                              <Component id="seperatorVertical" max="32767" attributes="0"/>
+                          </Group>
+                          <Component id="seperatorVertical1" max="32767" attributes="0"/>
                       </Group>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="SaveGraphics" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="SelectTxtFile" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace pref="109" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="seperatorHorizontal" min="-2" pref="10" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
+                      <Component id="buttonOpenTxtFile" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Component id="labelSaveGraphicsTo" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Component id="labelSelectedTxtFile" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="15" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Component class="javax.swing.JButton" name="GenerateGraphics">
+            <Component class="javax.swing.JButton" name="buttonGenerateGraphics">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Generate graphics"/>
                 <Property name="toolTipText" type="java.lang.String" value="Generate the graphics into the selected folder"/>
@@ -318,13 +377,13 @@
                 <Property name="verticalTextPosition" type="int" value="3"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="GenerateGraphicsActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonGenerateGraphicsActionPerformed"/>
               </Events>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="BufferedImage imgGearIcon = null;&#xa;try {&#xa;    imgGearIcon = ImageIO.read(new File(&quot;Images/Gear Icon.png&quot;));&#xa;} catch (IOException e) {&#xa;    e.printStackTrace();&#xa;}&#xa;Image dimgGearIcon = imgGearIcon.getScaledInstance(30, 30, Image.SCALE_SMOOTH);&#xa;ImageIcon imageIconGearIcon = new ImageIcon(dimgGearIcon);"/>
               </AuxValues>
             </Component>
-            <Component class="javax.swing.JButton" name="ImportGraphics">
+            <Component class="javax.swing.JButton" name="buttonImportGraphics">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Import graphics"/>
                 <Property name="toolTipText" type="java.lang.String" value="Start the automatic importing of graphics into Ignite"/>
@@ -332,53 +391,80 @@
                 <Property name="verticalTextPosition" type="int" value="3"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ImportGraphicsActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonImportGraphicsActionPerformed"/>
               </Events>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="BufferedImage imgImportIcon = null;&#xa;try {&#xa;    imgImportIcon = ImageIO.read(new File(&quot;Images/Play Icon.png&quot;));&#xa;} catch (IOException e) {&#xa;    e.printStackTrace();&#xa;}&#xa;Image dimgImportIcon = imgImportIcon.getScaledInstance(30, 30, Image.SCALE_SMOOTH);&#xa;ImageIcon imageIconImportIcon = new ImageIcon(dimgImportIcon);"/>
               </AuxValues>
             </Component>
-            <Component class="javax.swing.JButton" name="SaveGraphics">
+            <Component class="javax.swing.JButton" name="buttonSaveGraphicsTo">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Save graphics to..."/>
                 <Property name="toolTipText" type="java.lang.String" value="Select the folder to save graphics to"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="SaveGraphicsActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonSaveGraphicsToActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="SelectTxtFile">
+            <Component class="javax.swing.JButton" name="buttonSelectTxtFile">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Select .txt file"/>
                 <Property name="toolTipText" type="java.lang.String" value="Select the .txt file containing the band information"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="SelectTxtFileActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonSelectTxtFileActionPerformed"/>
               </Events>
             </Component>
+            <Component class="javax.swing.JButton" name="buttonOpenTxtFile">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Open selected .txt file"/>
+                <Property name="toolTipText" type="java.lang.String" value="Click here to open the selected .txt file"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonOpenTxtFileActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JLabel" name="labelSaveGraphicsTo">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Save graphics to: no location selected"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="labelSelectedTxtFile">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Selected .txt file: no file selected"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JButton" name="buttonUnlockDrive">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Unlock Drive"/>
+                <Property name="toolTipText" type="java.lang.String" value="Unlock the hard drive using WD Drive Unlocker"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonUnlockDriveActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="buttonOpenIgnite">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Open Ignite"/>
+                <Property name="toolTipText" type="java.lang.String" value="Open the Ignite OPx software"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonOpenIgniteActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JSeparator" name="seperatorHorizontal">
+            </Component>
+            <Component class="javax.swing.JSeparator" name="seperatorVertical">
+              <Properties>
+                <Property name="orientation" type="int" value="1"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JSeparator" name="seperatorVertical1">
+              <Properties>
+                <Property name="orientation" type="int" value="1"/>
+              </Properties>
+            </Component>
           </SubComponents>
-        </Container>
-        <Container class="javax.swing.JPanel" name="Folders">
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Folders">
-                <Property name="tabTitle" type="java.lang.String" value="Folders"/>
-              </JTabbedPaneConstraints>
-            </Constraint>
-          </Constraints>
-
-          <Layout>
-            <DimensionLayout dim="0">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="438" max="32767" attributes="0"/>
-              </Group>
-            </DimensionLayout>
-            <DimensionLayout dim="1">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="173" max="32767" attributes="0"/>
-              </Group>
-            </DimensionLayout>
-          </Layout>
         </Container>
         <Container class="javax.swing.JPanel" name="Location">
           <Constraints>
@@ -406,9 +492,7 @@
                           <Component id="locationButtonAddLocation" max="32767" attributes="0"/>
                           <Component id="locationButtonRemoveCurrentLocation" max="32767" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="58" max="32767" attributes="0"/>
-                      <Component id="buttonPrint" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="36" max="-2" attributes="0"/>
+                      <EmptySpace pref="153" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -417,10 +501,7 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="locationComboboxLocationSelector" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="buttonPrint" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
+                          <Component id="locationComboboxLocationSelector" min="-2" max="-2" attributes="0"/>
                           <Component id="locationLabelCurrentLocation" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
@@ -435,7 +516,7 @@
                       </Group>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="locationButtonEditCurrentLocation" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="21" max="32767" attributes="0"/>
+                      <EmptySpace pref="43" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -491,69 +572,6 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="locationButtonEditCurrentLocationActionPerformed"/>
-              </Events>
-            </Component>
-            <Component class="javax.swing.JButton" name="buttonPrint">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Print"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonPrintActionPerformed"/>
-              </Events>
-            </Component>
-          </SubComponents>
-        </Container>
-        <Container class="javax.swing.JPanel" name="ExternalSoftware">
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="External Software">
-                <Property name="tabTitle" type="java.lang.String" value="External Software"/>
-              </JTabbedPaneConstraints>
-            </Constraint>
-          </Constraints>
-
-          <Layout>
-            <DimensionLayout dim="0">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="buttonUnlockDrive" max="32767" attributes="0"/>
-                          <Component id="buttonOpenIgnite" max="32767" attributes="0"/>
-                      </Group>
-                      <EmptySpace pref="335" max="32767" attributes="0"/>
-                  </Group>
-              </Group>
-            </DimensionLayout>
-            <DimensionLayout dim="1">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="buttonUnlockDrive" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace type="separate" max="-2" attributes="0"/>
-                      <Component id="buttonOpenIgnite" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="103" max="32767" attributes="0"/>
-                  </Group>
-              </Group>
-            </DimensionLayout>
-          </Layout>
-          <SubComponents>
-            <Component class="javax.swing.JButton" name="buttonUnlockDrive">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Unlock Drive"/>
-                <Property name="toolTipText" type="java.lang.String" value="Unlock the hard drive using WD Drive Unlocker"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonUnlockDriveActionPerformed"/>
-              </Events>
-            </Component>
-            <Component class="javax.swing.JButton" name="buttonOpenIgnite">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Open Ignite"/>
-                <Property name="toolTipText" type="java.lang.String" value="Open the Ignite OPx software"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonOpenIgniteActionPerformed"/>
               </Events>
             </Component>
           </SubComponents>
