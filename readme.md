@@ -17,4 +17,4 @@ Proudly automating the graphics upload process into the advertising software and
 Through the development of Automated Graphics Generator, I learned how to create a GUI in Java, automate computer processes, and create and export images. I worked with serialization to create a program that "remembers" what happened between multiple runs. I learned how to use the Netbeans IDE, a completely unfamiliar system for Java GUI production.
 
 ## Future developments
-I hope to develop Automated Graphics Generator into a .exe program that reads from a spreadsheet, allowing users to work with more idealized text documents.
+I hope to develop Automated Graphics Generator into a .exe program that reads from a spreadsheet, allowing users to work with less idealized documents.
